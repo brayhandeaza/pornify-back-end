@@ -1,53 +1,44 @@
-import re
-import requests
-import json
+import datetime
 
 
-def fetch_pornwhite_single_video(video_id, title_id, box_id):
-    url = f"https://www.pornwhite.com/videos/{video_id}/{title_id}/"
-    response = requests.get(url)
-    match = re.search(r'flashvars\s*=\s*{([^}]*)}', response.text)
+def format_duration(duration_str):
+    hours = 0
+    minutes = 0
+    seconds = 0
 
-    if match:
-        flashvars = match.group(1)
+    if 'H' in duration_str:
+        hours = int(duration_str.split('T')[-1].split('H')[0])
+        duration_str = duration_str.split('H')[-1]
 
-        data = flashvars.replace("\t", "")
-        data = re.sub(r'\s+', '', data)
-        data = json.dumps(data).replace("\"", "")
+    if 'M' in duration_str:
+        if 'H' in duration_str:
+            minutes = int(duration_str.split('H')[-1].split('M')[0])
+            duration_str = duration_str.split('M')[-1]
+        else:
+            minutes = int(duration_str.split('T')[-1].split('M')[0])
+            duration_str = duration_str.split('M')[-1]
 
-        string_list = data.split("',")
+    if 'S' in duration_str:
+        if 'M' in duration_str:
+            seconds = int(duration_str.split('M')[-1].split('S')[0])
+        elif 'H' in duration_str:
+            seconds = int(duration_str.split('H')[-1].split('S')[0])
+        else:
+            seconds = int(duration_str.split('T')[-1].split('S')[0])
 
-        video = {
-            "title_id": title_id,
-            "title": title_id.replace("-", " ").title(),
-            "source_url": url,
-            "thumb": f"https://cdni.pornwhite.com/contents/videos_screenshots/{box_id}/{video_id}/{video_id}/3.jpg?ver=3",
-        }
-        for i in range(len(string_list)):
-            key_and_value = None
+    time = datetime.timedelta(
+        hours=hours,
+        minutes=minutes,
+        seconds=seconds
+    )
 
-            if string_list[i].split(':')[0].strip() != "video_url":
-                key_and_value = string_list[i].split(":")
-            else:
-                key_and_value = string_list[i].split(":'")
-                video["video_url"] = key_and_value[1]
-                print(key_and_value)
-
-            key = key_and_value[0].strip()
-            value = key_and_value[1].strip()
-      
-
-            if key == "video_id":
-                video[key] = value.replace("'", "")
-                
-            elif key == "video_tags":
-                video["keywords"] = value.replace("'", "").lower().split(",")
-
-        print(json.dumps(video, indent=4))
+    duration = str(time).split(":")
+    if duration[0] == "0":
+        return str(time)[2:]
+    else:
+        return str(time)
 
 
-video_id = "3109027"
-title_id = "milfaf-milf-wendy-raine-got-sprayed-with-jizz"
-box_id = "3109000",
-
-fetch_pornwhite_single_video(video_id, title_id, box_id)
+print(format_duration("PT1H56M51S"))
+print(format_duration("T02M04S"))
+print(format_duration("T49S"))

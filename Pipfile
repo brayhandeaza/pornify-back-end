@@ -11,6 +11,9 @@ bs4 = "*"
 flask-cors = "*"
 flask-caching = "*"
 selenium = "*"
+fastapi = "*"
+uvicorn = "*"
+cachetools = "*"
 
 [dev-packages]
 autopep8 = "*"
