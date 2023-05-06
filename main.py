@@ -7,6 +7,7 @@ app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:8000",
+    "http://localhost:3001",
     "http://localhost:3000",
 ]
 
@@ -19,7 +20,6 @@ app.add_middleware(
 )
 
 app.include_router(videos_router, prefix="/videos")
-
 
 @app.get("/{path:path}")
 async def catch_all(path: str):

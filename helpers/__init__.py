@@ -54,6 +54,8 @@ def format_duration(duration_str):
 SOURCES = {
     "62756C65": "xxxbule",
     "76696B69": "vikiporn",
+    "706f726e": "pornicom",
+    "70657276": "pervclips",
     "7768697465": "pornwhite",
 }
 
@@ -62,10 +64,15 @@ class XxxBule():
     def __init__(self):
         self.base_url = "https://www.xxxbule.com/"
 
-    def all(self, category):
-        category_url = f"{self.base_url}streams/{category}-freeporn/"
-        url = category_url if bool(
-            category) else f"{self.base_url}streams/gay-freeporn/"
+    def all(self, search, query_type=""):
+        url = None
+
+        if query_type == "query":
+            url = f"{self.base_url}/search/?q={search}/"
+        elif query_type == "category":
+            url = f"{self.base_url}/categories/{search}/"
+        else:
+            url = f"{self.base_url}latest-updates/"
 
         page = requests.get(url)
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -89,7 +96,6 @@ class XxxBule():
 
                 data = {
                     "id": hash,
-                    "source_url": "www.xxxbule.com",
                     "thumb": thumb,
                     "title": title,
                     "title_id": title.replace(" ", "-").lower(),
@@ -108,11 +114,10 @@ class XxxBule():
         tag = soup.select_one("script")
         data = json.loads(tag.getText())
 
-        if ("contentUrl" in data and "thumbnailUrl" in data and "description" in data and "keywords" in data):
+        if ("contentUrl" in data and "thumbnailUrl" in data and "keywords" in data):
             video = {
                 "source": "www.xxxbule.com",
                 "video_url": data["contentUrl"],
-                "description": data["description"],
                 "thumb": data["thumbnailUrl"],
                 "keywords": str(data["keywords"]).split(","),
             }
@@ -125,10 +130,16 @@ class VikiPorn():
     def __init__(self):
         self.base_url = "https://www.vikiporn.com/"
 
-    def all(self, category):
-        category_url = f"{self.base_url}categories/{category}/"
-        url = category_url if bool(
-            category) else f'{self.base_url}latest-updates/'
+    def all(self, search, query_type=""):
+        url = None
+
+        if query_type == "query":
+            url = f"{self.base_url}/search/?q={search}/"
+        elif query_type == "category":
+            url = f"{self.base_url}/categories/{search}/"
+        else:
+            url = f"{self.base_url}latest-updates/"
+
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -150,7 +161,6 @@ class VikiPorn():
 
             data = {
                 "id": hash,
-                "source_url": "www.vikiporn.com",
                 "source_url": url,
                 "video_url": video["data-src"].replace("_preview", ""),
                 "thumb": video["data-poster"],
@@ -194,12 +204,17 @@ class PornWhite():
     def __init__(self):
         self.base_url = "https://www.pornwhite.com/"
 
-    def all(self, category):
-        category_url = f"{self.base_url}category/{category}"
-        url = f"{self.base_url}latest-updates/"
-        base_url = category_url if bool(category) else url
+    def all(self, search, query_type=""):
+        url = None
 
-        response = requests.get(base_url)
+        if query_type == "query":
+            url = f"{self.base_url}/search/?q={search}/"
+        elif query_type == "category":
+            url = f"{self.base_url}/categories/{search}/"
+        else:
+            url = f"{self.base_url}latest-updates/"
+
+        response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
         tags = soup.select(".thumbs-list .thumb")
 
@@ -236,7 +251,7 @@ class PornWhite():
                 videos.append(video)
         return videos
 
-    def one(self, video_id, title_id, box_id):
+    def one(self, box_id, video_id, title_id):
         url = f"{self.base_url}videos/{video_id}/{title_id}/"
         response = requests.get(url)
         match = re.search(r'flashvars\s*=\s*{([^}]*)}', response.text)
@@ -282,6 +297,188 @@ class PornWhite():
             return False
 
 
+class Pornicom():
+    def __init__(self):
+        self.base_url = "https://www.pornicom.com/"
+
+    def all(self, search, query_type=""):
+        url = None
+
+        if query_type == "query":
+            url = f"{self.base_url}/search/?q={search}/"
+        elif query_type == "category":
+            url = f"{self.base_url}/categories/{search}/"
+        else:
+            url = self.base_url
+
+        page = requests.get(url)
+        soup = BeautifulSoup(page.content, 'html.parser')
+        tags = soup.select(".items-list .item")
+
+        videos = []
+        for tag in tags:
+            video_id = tag.select_one(".img-holder").attrs['data-id']
+            if video_id:
+                title = tag.select_one(".thumb").attrs["alt"]
+                video_url = tag.select_one(
+                    ".img-holder").attrs['data-src'].replace("_preview", "")
+                source_url = tag.select_one("a").attrs['href']
+                box_id = video_url.replace(
+                    "https://cdn.pornicom.com/storage/contents/videos/", "").split("/")[0]
+                thumb = f"https://cdni.pornicom.com/contents/videos_screenshots/{box_id}/{video_id}/390x293/3.jpg"
+
+            # id = [box_id, source_id, video_id]
+            id = [box_id, "706f726e", video_id]
+            hash = dict_to_base64_string(id)
+
+            data = {
+                "id": hash,
+                "box_id": box_id,
+                "thumb": thumb,
+                "title": title,
+                "title_id": source_url.replace(f"https://www.pornicom.com/videos/{video_id}/", "").replace("/", "").lower(),
+                "source_url": source_url,
+                "video_url": video_url
+            }
+
+            videos.append(data)
+
+        return videos
+
+    def one(self, box_id, video_id, title_id):
+        url = f'{self.base_url}videos/{video_id}/{title_id}/'
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        tags = soup.select(".player meta")
+
+        video = {
+            "box_id": box_id,
+            "video_id": video_id,
+            "title_id": title_id,
+            "video_url": f"https://cdn.pornicom.com/storage/contents/videos/{box_id}/{video_id}/{video_id}.mp4"
+        }
+
+        for tag in tags:
+            if (tag["itemprop"] == "duration" or tag["itemprop"] == "thumbnailUrl") or tag["itemprop"] == "name" or tag["itemprop"] == "keywords":
+                if tag["itemprop"] == "keywords":
+                    video["keywords"] = [
+                        item for item in tag["content"].split(", ") if item != ""]
+
+                elif tag["itemprop"] == "thumbnailUrl":
+                    video["thumb"] = tag["content"]
+
+                elif tag["itemprop"] == "url":
+                    video["source_url"] = tag["content"]
+
+                elif tag["itemprop"] == "name":
+                    video["title"] = tag["content"]
+
+                else:
+                    video[tag["itemprop"]] = tag["content"]
+
+        if bool(video["video_url"]):
+            return video
+        return False
+
+
+class PervClips():
+    def __init__(self):
+        self.base_url = "https://www.pervclips.com/tube/"
+
+    def all(self, search, query_type=""):
+        url = None
+
+        if query_type == "query":
+            url = f"{self.base_url}/search/?q={search}/"
+        elif query_type == "category":
+            url = f"{self.base_url}/categories/{search}/"
+        else:
+            url = self.base_url
+
+        page = requests.get(url)
+        soup = BeautifulSoup(page.content, 'html.parser')
+        tags = soup.select(".items-list .item")
+
+        videos = []
+        for tag in tags:
+
+            video_id = tag.select_one("a").attrs["data-id"]
+            if video_id:
+                video_url = tag.select_one(
+                    "a").attrs["data-src"].replace("_preview", "")
+                box_id = video_url.replace(
+                    "https://cdn0.pervclips.com/contents/videos/", "").split("/")[0]
+                title_id = tag.select_one("a").attrs["href"].replace(
+                    "/tube/videos/", "").replace("/", "").lower()
+                source_url = f"https://www.pervclips.com{tag.select_one('a').attrs['href']}"
+                title = tag.select_one(".title").getText().strip()
+                thumb = tag.select_one("a").attrs["data-poster"]
+
+                # [box_id, source_id, video_id]
+                id = [box_id, "70657276", video_id]
+                hash = dict_to_base64_string(id)
+
+            data = {
+                "id": hash,
+                "video_url": video_url,
+                "source_url": source_url,
+                "box_id": box_id,
+                "thumb": thumb,
+                "title": title,
+                "title_id": title_id
+            }
+            videos.append(data)
+
+        return videos
+
+    def one(self, box_id, video_id, title_id):
+        url = f'{self.base_url}videos/{title_id}/'
+        response = requests.get(url)
+        match = re.search(r'flashvars\s*=\s*{([^}]*)}', response.text)
+
+        if match:
+            flashvars = match.group(1)
+
+            data = flashvars.replace("\t", "")
+            data = re.sub(r'\s+', '', data)
+            data = json.dumps(data).replace("\"", "")
+
+            string_list = data.split("',")
+
+            video = {
+                "title_id": title_id,
+                "box_id": box_id,
+                "title": title_id.replace("-", " ").title(),
+                "source_url": url,
+                "thumb": f"https://cdn.pervclips.com/tube/contents/videos_screenshots/{box_id}/{video_id}/preview.jpg",
+            }
+
+            for i in range(len(string_list)):
+                key_and_value = None
+
+                if string_list[i].split(':')[0].strip() != "video_url":
+                    key_and_value = string_list[i].split(":")
+
+                else:
+                    key_and_value = string_list[i].split(":'")
+                    video["video_url"] = f"https://cdn0.pervclips.com/contents/videos/{box_id}/{video_id}/{video_id}.mp4"
+                    # video["video_url"] = key_and_value[1][:-1]
+
+                key = key_and_value[0].strip()
+                value = key_and_value[1].strip()
+
+                if key == "video_id":
+                    video[key] = value.replace("'", "")
+
+                elif key == "video_tags":
+                    video["keywords"] = [item for item in value.replace(
+                        "'", "").lower().split(",") if item != ""]
+
+        return video
+
+
+pervclips = PervClips()
 xxxbule = XxxBule()
 vikiporn = VikiPorn()
 pornwhite = PornWhite()
+pornicom = Pornicom()
