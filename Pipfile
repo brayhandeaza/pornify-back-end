@@ -16,6 +16,7 @@ uvicorn = "*"
 cachetools = "*"
 ply = "*"
 lark = "*"
+gunicorn = "*"
 
 [dev-packages]
 autopep8 = "*"

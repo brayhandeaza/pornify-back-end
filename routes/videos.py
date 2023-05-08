@@ -1,4 +1,4 @@
-from helpers import xxxbule, pornwhite, vikiporn, pornicom, pervclips, SOURCES
+from helpers import xxxbule, pornwhite, vikiporn, pornicom, pervclips, SOURCES, CATEGORIES
 import random
 import base64
 import ast
@@ -7,7 +7,7 @@ from cachetools import TTLCache
 from fastapi.responses import JSONResponse
 
 router = APIRouter()
-cache = TTLCache(ttl=60 * 10, maxsize=1000)
+cache = TTLCache(maxsize=100, ttl=60)
 
 
 @router.get("/")
@@ -35,13 +35,44 @@ async def get_videos(limit=Query(100)):
     return videos
 
 
+@router.get("/search")
+async def get_videos(limit=Query(100), q=Query(None)):
+    if q in cache:
+        return cache[q]
+
+    if q == None:
+        return {
+            "status": 422,
+            "message": "Unprocessable Entity: q param is required",
+        }
+
+    vikiporn_videos = vikiporn.all(q, "search")
+    xxxbule_videos = xxxbule.all(q, "search")
+    pornwhite_videos = pornwhite.all(q, "search")
+    pornicom_videos = pornicom.all(q, "search")
+    pervclips_videos = pervclips.all(q, "search")
+
+    results = pornicom_videos + vikiporn_videos + xxxbule_videos + pornwhite_videos + pervclips_videos
+    random.shuffle(results)
+
+    videos = {
+        "q": q,
+        "status": 200,
+        "count": len(results[:int(limit)]),
+        "data": results[:int(limit)]
+    }
+
+    cache[q] = videos
+    return videos
+
+
 @router.get("/category")
 async def get_videos_by_catgory(search=Query(None), limit=Query(100)):
 
     if search == None:
         return {
             "status": 422,
-            "message": "Unprocessable Entity: search is require",
+            "message": "Unprocessable Entity: search param is required",
         }
 
     if search in cache:
@@ -53,8 +84,7 @@ async def get_videos_by_catgory(search=Query(None), limit=Query(100)):
     pornicom_videos = pornicom.all(search, "category")
     pervclips_videos = pervclips.all(search, "category")
 
-    results = pornicom_videos + vikiporn_videos + \
-        xxxbule_videos + pornwhite_videos + pervclips_videos
+    results = pornicom_videos + vikiporn_videos +  xxxbule_videos + pornwhite_videos + pervclips_videos
     random.shuffle(results)
 
     videos = {
@@ -66,6 +96,12 @@ async def get_videos_by_catgory(search=Query(None), limit=Query(100)):
     cache[search] = videos
     return videos
 
+@router.get("/all-categories")
+async def all_categories():
+    return {
+        "status": 200,
+        "data": CATEGORIES
+    }
 
 @router.get("/play")
 async def get_video_to_play(id=Query(None), title_id=Query(None)):

@@ -59,20 +59,23 @@ SOURCES = {
     "7768697465": "pornwhite",
 }
 
+CATEGORIES = [
+    'girlfriend', 'reality', 'compilation', 'big ass', '18+', 'latina', 'shemale / tranny', 'saggy tits', 'fisting', 'stockings', 'nudist', 'bisexual', 'japanese', 'blowjob', 'rimming', 'cumshot', 'shaved', 'threesome', 'big tits', 'masturbation', 'brunette', 'fully clothed sex', 'squirting', 'hidden camera', 'coed', 'retro', 'playboy', 'hd', 'pornstar', 'mature', '3d', 'celebrity', 'kissing', 'babe', 'massage', 'big cock', 'pantyhose', 'cuckold', 'american', 'milf', 'hentai', 'babysitter', 'teen', 'bdsm', 'lesbian', 'skinny', 'cfnm', 'amateur', 'fetish', 'masturbating', 'interracial', 'creampie', 'domination', 'stepmom', 'pov', 'solo', 'european', 'voyeur', 'indian', 'anime', 'lingerie', 'anal', 'double penetration', 'bbw', 'small tits', 'orgasm', 'gf', 'midget', 'orgy', 'outdoors', 'busty', 'old and young', 'wife', 'beach', 'bukkake', 'outdoor', 'solo girl', 'foot', 'cumshots', 'fantasy', 'humiliation', 'dad', 'shemale', 'rough sex', 'camel toe hoes', 'black hair', 'gangbang', 'german', 'petite', 'granny', 'tight pussy', 'cartoon', 'doctor', 'asian', 'hardcore', 'big dick', 'gay', 'mom', 'hairy', 'pissing', 'blonde', 'beautiful', 'group sex', 'cum swallowing', 'black', 'dp', 'taboo', 'ebony', 'teen (18+)', 'homemade', 'redhead', 'step fantasy', 'gonzo', 'vintage', 'french', 'casting', 'tranny', 'bikini', 'ass', '18 year old', 'handjob', 'toys'
+]
 
 class XxxBule():
     def __init__(self):
-        self.base_url = "https://www.xxxbule.com/"
+        self.base_url = "https://www.xxxbule.com"
 
-    def all(self, search, query_type=""):
+    def all(self, search, search_type=""):
         url = None
 
-        if query_type == "query":
+        if search_type == "search":
             url = f"{self.base_url}/search/?q={search}/"
-        elif query_type == "category":
-            url = f"{self.base_url}/categories/{search}/"
+        elif search_type == "category":
+            url = f"{self.base_url}/streams/{search}-freeporn/"
         else:
-            url = f"{self.base_url}latest-updates/"
+            url = f"{self.base_url}/latest-updates/"
 
         page = requests.get(url)
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -130,12 +133,12 @@ class VikiPorn():
     def __init__(self):
         self.base_url = "https://www.vikiporn.com/"
 
-    def all(self, search, query_type=""):
+    def all(self, search, search_type=""):
         url = None
 
-        if query_type == "query":
+        if search_type == "search":
             url = f"{self.base_url}/search/?q={search}/"
-        elif query_type == "category":
+        elif search_type == "category":
             url = f"{self.base_url}/categories/{search}/"
         else:
             url = f"{self.base_url}latest-updates/"
@@ -204,12 +207,12 @@ class PornWhite():
     def __init__(self):
         self.base_url = "https://www.pornwhite.com/"
 
-    def all(self, search, query_type=""):
+    def all(self, search, search_type=""):
         url = None
 
-        if query_type == "query":
+        if search_type == "search":
             url = f"{self.base_url}/search/?q={search}/"
-        elif query_type == "category":
+        elif search_type == "category":
             url = f"{self.base_url}/categories/{search}/"
         else:
             url = f"{self.base_url}latest-updates/"
@@ -301,12 +304,12 @@ class Pornicom():
     def __init__(self):
         self.base_url = "https://www.pornicom.com/"
 
-    def all(self, search, query_type=""):
+    def all(self, search, search_type=""):
         url = None
 
-        if query_type == "query":
+        if search_type == "search":
             url = f"{self.base_url}/search/?q={search}/"
-        elif query_type == "category":
+        elif search_type == "category":
             url = f"{self.base_url}/categories/{search}/"
         else:
             url = self.base_url
@@ -385,12 +388,12 @@ class PervClips():
     def __init__(self):
         self.base_url = "https://www.pervclips.com/tube/"
 
-    def all(self, search, query_type=""):
+    def all(self, search, search_type=""):
         url = None
 
-        if query_type == "query":
+        if search_type == "search":
             url = f"{self.base_url}/search/?q={search}/"
-        elif query_type == "category":
+        elif search_type == "category":
             url = f"{self.base_url}/categories/{search}/"
         else:
             url = self.base_url
