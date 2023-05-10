@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.videos import router as videos_router, update_cache
-# from routes.tags import items as items_router
+from routes.tags import tags as tags_router
 # from sqlmodel import SQLModel
 # from config.database import engine
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -23,7 +23,7 @@ app.add_middleware(
 
 
 app.include_router(videos_router, prefix="/videos")
-# app.include_router(items_router, prefix="/items")
+app.include_router(tags_router, prefix="/tags")
 
 
 def call_my_route():
