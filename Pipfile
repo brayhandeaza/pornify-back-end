@@ -4,19 +4,17 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "*"
 lxml = "*"
 requests = "*"
 bs4 = "*"
-flask-cors = "*"
-flask-caching = "*"
-selenium = "*"
 fastapi = "*"
 uvicorn = "*"
 cachetools = "*"
-ply = "*"
-lark = "*"
 gunicorn = "*"
+databases = "*"
+aiosqlite = "*"
+sqlalchemy = "==1.4.42"
+apscheduler = "*"
 
 [dev-packages]
 autopep8 = "*"

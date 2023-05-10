@@ -7,10 +7,14 @@ from cachetools import TTLCache
 from fastapi.responses import JSONResponse
 
 router = APIRouter()
-cache = TTLCache(maxsize=100, ttl=60)
+cache = TTLCache(maxsize=100, ttl=60 * 10)
 
 
-@router.get("/")
+def update_cache(data):
+    cache["videos"] = data
+
+
+@router.get("")
 async def get_videos(limit=Query(100)):
     if "videos" in cache:
         return cache["videos"]
@@ -52,7 +56,8 @@ async def get_videos(limit=Query(100), q=Query(None)):
     pornicom_videos = pornicom.all(q, "search")
     pervclips_videos = pervclips.all(q, "search")
 
-    results = pornicom_videos + vikiporn_videos + xxxbule_videos + pornwhite_videos + pervclips_videos
+    results = pornicom_videos + vikiporn_videos + \
+        xxxbule_videos + pornwhite_videos + pervclips_videos
     random.shuffle(results)
 
     videos = {
@@ -84,7 +89,8 @@ async def get_videos_by_catgory(search=Query(None), limit=Query(100)):
     pornicom_videos = pornicom.all(search, "category")
     pervclips_videos = pervclips.all(search, "category")
 
-    results = pornicom_videos + vikiporn_videos +  xxxbule_videos + pornwhite_videos + pervclips_videos
+    results = pornicom_videos + vikiporn_videos + \
+        xxxbule_videos + pornwhite_videos + pervclips_videos
     random.shuffle(results)
 
     videos = {
@@ -96,12 +102,14 @@ async def get_videos_by_catgory(search=Query(None), limit=Query(100)):
     cache[search] = videos
     return videos
 
+
 @router.get("/all-categories")
 async def all_categories():
     return {
         "status": 200,
         "data": CATEGORIES
     }
+
 
 @router.get("/play")
 async def get_video_to_play(id=Query(None), title_id=Query(None)):
