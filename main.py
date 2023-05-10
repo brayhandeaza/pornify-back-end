@@ -1,16 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.videos import router as videos_router, update_cache
-from routes.tags import items as items_router
-from sqlmodel import SQLModel
-from config.database import engine
-from apscheduler.schedulers.background import BackgroundScheduler
+# from routes.tags import items as items_router
+# from sqlmodel import SQLModel
+# from config.database import engine
+# from apscheduler.schedulers.background import BackgroundScheduler
 from helpers import xxxbule, pornwhite, vikiporn, pornicom, pervclips
 import random
 
 app = FastAPI()
-scheduler = BackgroundScheduler()
-SQLModel.metadata.create_all(engine)
+# scheduler = BackgroundScheduler()
+# SQLModel.metadata.create_all(engine)
 
 
 app.add_middleware(
@@ -22,14 +22,14 @@ app.add_middleware(
 )
 
 
-@app.on_event("startup")
-async def startup_event():
-    with engine.begin() as conn:
-        pass
+# @app.on_event("startup")
+# async def startup_event():
+#     with engine.begin() as conn:
+#         pass
 
 
 app.include_router(videos_router, prefix="/videos")
-app.include_router(items_router, prefix="/items")
+# app.include_router(items_router, prefix="/items")
 
 
 def call_my_route():
@@ -52,8 +52,8 @@ def call_my_route():
     update_cache(videos)
 
 
-scheduler.add_job(call_my_route, 'interval', seconds=60 * 9)
-scheduler.start()
+# scheduler.add_job(call_my_route, 'interval', seconds=60 * 9)
+# scheduler.start()
 
 
 @app.get("/{path:path}")
